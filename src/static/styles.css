@@ -1,0 +1,59 @@
+.logo {
+    width: 32px;
+    height: 32px;
+}
+
+.container {
+    max-width: 800px;
+}
+
+.shadow {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.btn-lg {
+    padding: 0.75rem 2rem;
+    margin: 0 1rem;
+}
+
+.consent-result-card {
+    min-width: 600px;
+    max-width: 800px;
+}
+
+.success-icon svg, .error-icon svg {
+    width: 4rem;
+    height: 4rem;
+}
+
+.success-icon svg {
+    color: #28a745;
+}
+
+.error-icon svg {
+    color: #dc3545;
+}
+
+.w-16 {
+    width: 4rem;
+}
+.h-16 {
+    height: 4rem;
+}
+.text-success {
+    color: #28a745 !important;
+}
+.text-danger {
+    color: #dc3545 !important;
+}
+@media (max-width: 768px) {
+    .consent-result-card {
+        min-width: 90%;
+        margin: 0 1rem;
+    }
+    .success-icon svg,
+    .error-icon svg {
+        width: 3rem;
+        height: 3rem;
+    }
+}
