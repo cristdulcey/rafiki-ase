@@ -1,6 +1,6 @@
 services:
   ase:
-    image: registry.digitalocean.com/loducode/ase:1.0.4
+    image: registry.digitalocean.com/loducode/rafiki-ase:2
 #    security_opt:
 #      - seccomp:unconfined
 #    build:

@@ -39,7 +39,7 @@ def create_tiger_beetle_account_wallet(id, asset_id, ledger, code) -> bool:
     flags = AccountFlags(
         AccountFlags.DEBITS_MUST_NOT_EXCEED_CREDITS | AccountFlags.HISTORY
     )
-    with tb.ClientSync(cluster_id=0, replica_addresses=settings.tiger_beetle_address) as client:
+    with tb.ClientAsync(cluster_id=0, replica_addresses=settings.tiger_beetle_address) as client:
         account = tb.Account(
             id=tb_id,
             debits_pending=0,
@@ -67,7 +67,7 @@ def create_tiger_beetle_account_wallet(id, asset_id, ledger, code) -> bool:
 
 def create_transfer_tiger_bettle(id_transaction, debit_account, credit_account, amount, ledger, code: int = 2,
                                  flag: TransferFlags = TransferFlags.NONE, pending_id: str = '') -> bool:
-    with tb.ClientSync(cluster_id=0, replica_addresses=settings.tiger_beetle_address) as client:
+    with tb.ClientAsync(cluster_id=0, replica_addresses=settings.tiger_beetle_address) as client:
         tb_transaction_id = to_tiger_beetle_id(id_transaction)
         tb_debit_id = to_tiger_beetle_id(debit_account)
         tb_credit_id = to_tiger_beetle_id(credit_account)
@@ -105,14 +105,14 @@ def create_transfer_tiger_bettle(id_transaction, debit_account, credit_account, 
 def get_accounts_by_id(id_list) -> list:
     tb_ids = [to_tiger_beetle_id(id) for id in id_list]
     print('TB IDS:', tb_ids,settings.tiger_beetle_address)
-    with tb.ClientSync(cluster_id=0, replica_addresses=settings.tiger_beetle_address) as client:
+    with tb.ClientAsync(cluster_id=0, replica_addresses=settings.tiger_beetle_address) as client:
         accounts = client.lookup_accounts(tb_ids)
         print('Accounts:', accounts)
         return accounts
 
 
 def get_transactions_by_account(id_account) -> list:
-    with tb.ClientSync(cluster_id=0, replica_addresses=settings.tiger_beetle_address) as client:
+    with tb.ClientAsync(cluster_id=0, replica_addresses=settings.tiger_beetle_address) as client:
         filter = tb.AccountFilter(
             account_id=id_account,
             user_data_128=0,  # No filter by UserData.
@@ -132,7 +132,7 @@ def get_transactions_by_account(id_account) -> list:
 
 
 def get_balances_by_account(id_account) -> list:
-    with tb.ClientSync(cluster_id=0, replica_addresses=settings.tiger_beetle_address) as client:
+    with tb.ClientAsync(cluster_id=0, replica_addresses=settings.tiger_beetle_address) as client:
         filter = tb.AccountFilter(
             account_id=id_account,
             user_data_128=0,  # No filter by UserData.
@@ -153,13 +153,13 @@ def get_balances_by_account(id_account) -> list:
 
 def get_transfers_by_id(id_list) -> list:
     tb_ids = [to_tiger_beetle_id(id) for id in id_list]
-    with tb.ClientSync(cluster_id=0, replica_addresses=settings.tiger_beetle_address) as client:
+    with tb.ClientAsync(cluster_id=0, replica_addresses=settings.tiger_beetle_address) as client:
         transfers = client.lookup_transfers(tb_ids)
         return transfers
 
 
 def get_transfers() -> list:
-    with tb.ClientSync(cluster_id=0, replica_addresses=settings.tiger_beetle_address) as client:
+    with tb.ClientAsync(cluster_id=0, replica_addresses=settings.tiger_beetle_address) as client:
         query_filter = tb.QueryFilter(
             user_data_128=0,  # No Filter by user_data_128.
             user_data_64=0,  # No Filter by user_data_64.
