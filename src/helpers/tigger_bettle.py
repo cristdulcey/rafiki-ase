@@ -155,3 +155,21 @@ def get_transfers_by_id(id_list) -> list:
     with tb.ClientSync(cluster_id=0, replica_addresses=settings.tiger_beetle_address) as client:
         transfers = client.lookup_transfers(tb_ids)
         return transfers
+
+
+def get_transfers() -> list:
+    with tb.ClientSync(cluster_id=0, replica_addresses=settings.tiger_beetle_address) as client:
+        query_filter = tb.QueryFilter(
+            user_data_128=0,  # No Filter by user_data_128.
+            user_data_64=0,  # No Filter by user_data_64.
+            user_data_32=0,  # No Filter by user_data_32.
+            code=0,  # No Filter by Code.
+            ledger=0,  # No filter by Ledger.
+            timestamp_min=0,  # No filter by Timestamp.
+            timestamp_max=0,  # No filter by Timestamp.
+            limit=20,  # Limit to ten balances at most.
+            flags=tb.QueryFilterFlags.REVERSED,  # Sort by timestamp in reverse-chronological order.
+        )
+
+        query_transfers = client.query_transfers(query_filter)
+        return query_transfers

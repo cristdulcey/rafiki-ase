@@ -1,14 +1,14 @@
 services:
   ase:
-    image: registry.digitalocean.com/loducode/ase:12
+    image: registry.digitalocean.com/loducode/ase:1.0.1
     platform: linux/amd64
     build:
         context: .
         dockerfile: ./Dockerfile
-    command: sh -c "echo base | figlet && uvicorn main:app --reload --host 0.0.0.0 --port 9001"
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 10000
 #    env_file:
 #      - .envs/.env
-#    volumes:
-#      - ./src/:/code
+    volumes:
+      - ./src/:/code
     ports:
-      - 9001:9001
+      - "10000:10000"

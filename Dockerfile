@@ -1,4 +1,4 @@
-FROM python:3.9-slim as requirements-stage
+FROM python:3.9-slim AS requirements-stage
 WORKDIR /tmp
 # Instalar dependencias del sistema necesarias para Poetry
 RUN apt-get update && apt-get install -y \
@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
 # Instalar Poetry
 RUN pip install poetry poetry-plugin-export
 COPY ./src/pyproject.toml ./src/poetry.lock* /tmp/
-RUN poetry export -f requirements.txt --output requirements.txt
+RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 FROM python:3.9-slim
 ENV PYTHONUNBUFFERED=1
 ENV C_FORCE_ROOT=1

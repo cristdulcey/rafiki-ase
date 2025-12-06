@@ -35,11 +35,17 @@ def handle_event_outgoing_complete(event: WebHook, db: Session):
         raise HTTPException(status_code=404, detail="Wallet not found")
     debit = int(payment.debitAmount.value)
     send = int(payment.sentAmount.value)
+    balance = int(payment.balance or 0)
     to_void = debit - send
+    ledger = int(db_account.asset_ledger)
+
     print('Debit:', debit, 'Send:', send, 'To Void:', to_void)
     if to_void > 0:
-        # TODO: VALIDATE
-        pass
+        if balance == to_void:
+            send_fee_to_asset = create_transfer_tiger_bettle(
+                generate_uuid(), debit_account_ledger, f'{db_account.asset_id}', send, ledger, 3
+            )  # code=1 for TRANSFER code=2 for DEPOSIT code=3 for WITHDRAWAL
+
     outgoing_withdraw = create_outgoing_payment_withdrawal(client, payment.id)
     if not outgoing_withdraw:
         print("No outgoing withdrawal data found in the event.")
@@ -47,8 +53,8 @@ def handle_event_outgoing_complete(event: WebHook, db: Session):
     post_liquidity = post_liquidity_withdrawal(client, payment.id)
     if not post_liquidity:
         print("No post liquidity data found in the event.")
+    print(post_liquidity)
     # send the transfer to the ledger from the asset
-    ledger = int(db_account.asset_ledger)
     id_transaction_ledger = generate_uuid()
     debit_account_ledger = f'{db_account.asset_id}'  # Asset ID
     credit_account_ledger = ledger

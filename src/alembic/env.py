@@ -4,7 +4,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-
+from models.transfer import Base  # noqa
 from models.account import Base
 from database import DATABASE_URL
 
@@ -23,7 +23,6 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
-
 target_metadata = Base.metadata
 
 
