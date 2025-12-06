@@ -1,2 +1,2 @@
-FROM registry.digitalocean.com/loducode/rafiki_ase:base
+FROM registry.digitalocean.com/loducode/rafiki-ase:base
 COPY src/. /code
