@@ -170,6 +170,8 @@ def create_wallet(client, wallet_path: str, asset_id: str, name: str, additional
         )
         response.raise_for_status()
         wallet = response.json()
+        if wallet.get('errors'):
+            return None
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:
@@ -178,6 +180,8 @@ def create_wallet(client, wallet_path: str, asset_id: str, name: str, additional
         print("Timeout Error:", errt)
     except requests.exceptions.RequestException as err:
         print("OOps: Something Else", err)
+    except Exception as err:
+        print("OOps: Something", err)
     return wallet
 
 

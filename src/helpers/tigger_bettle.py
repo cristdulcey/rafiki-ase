@@ -1,4 +1,3 @@
-import os
 import re
 import tigerbeetle as tb
 from tigerbeetle import AccountFlags, TransferFlags
@@ -105,8 +104,10 @@ def create_transfer_tiger_bettle(id_transaction, debit_account, credit_account, 
 
 def get_accounts_by_id(id_list) -> list:
     tb_ids = [to_tiger_beetle_id(id) for id in id_list]
+    print('TB IDS:', tb_ids,settings.tiger_beetle_address)
     with tb.ClientSync(cluster_id=0, replica_addresses=settings.tiger_beetle_address) as client:
         accounts = client.lookup_accounts(tb_ids)
+        print('Accounts:', accounts)
         return accounts
 
 

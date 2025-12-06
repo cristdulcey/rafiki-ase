@@ -1,0 +1,60 @@
+name: Deployment
+
+on:
+  push:
+    branches: [ main ]
+    tags-ignore:
+      - "base-*"
+#on:
+#  workflow_run:
+#    workflows: ["Tests"]
+#    types:
+#      - completed
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@main
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      - name: Log in to DigitalOcean Container Registry with short-lived credentials
+        run: doctl registry login --expiry-seconds 1200
+      - name: Build container image
+        run: docker build -t ${{ vars.REGISTRY_NAME }}/${{github.event.repository.name}}:latest -t ${{ vars.REGISTRY_NAME }}/domi:${{github.run_number}} .
+      - name: Push image to DigitalOcean Container Registry
+        run: docker push --all-tags ${{ vars.REGISTRY_NAME }}/${{github.event.repository.name}}
+#  deploy-k8s:
+#    needs: build-and-push       # Job depends on next-build(above) job
+#    name: deploy to k8s
+#    runs-on: ubuntu-latest
+#    #    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+#    steps:
+#      - name: deploy to cluster
+#        uses: steebchen/kubectl@v2.0.0
+#        env:
+#          NAME_DEPLOY: 'domi'
+#          NAME_PROJECT: '${{vars.NAME_PROJECT}}'
+#          IMAGE_TAG: '${{ vars.REGISTRY_NAME }}/domi:${{github.run_number}}'
+#        with: # defaults to latest kubectl binary version
+#          config: ${{ secrets.KUBE_CONFIG_DATA }}
+#          command: set image --record deployment/$NAME_DEPLOY $NAME_DEPLOY=$IMAGE_TAG --namespace=$NAME_PROJECT --insecure-skip-tls-verify
+#      - name: verify deployment
+#        uses: steebchen/kubectl@v2.0.0
+#        env:
+#          NAME_DEPLOY: 'domi'
+#          NAME_PROJECT: '${{vars.NAME_PROJECT}}'
+#        with:
+#          command: rollout status deployment/$NAME_DEPLOY --namespace=$NAME_PROJECT --insecure-skip-tls-verify
+#          config: ${{ secrets.KUBE_CONFIG_DATA }}
+#      - name: Send slack
+#        uses: 8398a7/action-slack@v3
+#        with:
+#          status: ${{ job.status }}
+#          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest # selectable (default: repo,message)
+#        env:
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+#        if: always() # Pick up events even if the job fails or is canceled.
