@@ -3,7 +3,7 @@ name = "rafiki-ase"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "Cristian Dulcey",email = "christian.dulcey@gmail.com"}
+    { name = "Cristian Dulcey", email = "christian.dulcey@gmail.com" }
 ]
 readme = "README.md"
 requires-python = ">=3.11"
@@ -21,7 +21,8 @@ dependencies = [
     'python-multipart',
     'itsdangerous',
     'uvicorn',
-
+    'passlib',
+    'python-jose',
 ]
 
 [build-system]
