@@ -56,6 +56,8 @@ def create_incoming_payment(client, wallet_url: str, amount: int, scale: int, as
         )
         response.raise_for_status()
         incoming_payment = response.json()
+        if incoming_payment.get('errors'):
+            return None
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:
@@ -110,6 +112,8 @@ def create_quote(client, wallet_address_id: str, receiver_id: str):
         )
         response.raise_for_status()
         quote_payment = response.json()
+        if quote_payment.get('errors'):
+            return None
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:
@@ -172,6 +176,8 @@ def create_outgoing_payment(client, wallet_address_id: str, quote_id: str):
         )
         response.raise_for_status()
         outgoing_payment = response.json()
+        if outgoing_payment.get('errors'):
+            return None
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:
@@ -211,6 +217,8 @@ def create_incoming_payment_withdrawal(client, incoming_payment_id: str):
         )
         response.raise_for_status()
         withdrawal = response.json()
+        if withdrawal.get('errors'):
+            return None
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:
@@ -249,6 +257,8 @@ def deposit_outgoing_payment_liquidity(client, outgoing_payment_id: str):
         )
         response.raise_for_status()
         deposit_outgoing = response.json()
+        if deposit_outgoing.get('errors'):
+            return None
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:
@@ -288,6 +298,8 @@ def create_outgoing_payment_withdrawal(client, outgoing_payment_id: str):
         )
         response.raise_for_status()
         withdrawal_outgoing = response.json()
+        if withdrawal_outgoing.get('errors'):
+            return None
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:
@@ -380,6 +392,8 @@ def create_wallet_address_withdrawal(client, id_withdraw: str, wallet_address_id
         )
         response.raise_for_status()
         withdraw = response.json()
+        if withdraw.get('errors'):
+            return None
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:
@@ -460,6 +474,8 @@ def cancel_outgoing_payment(client, outgoing_payment_id: str, reason: str = 'Not
         )
         response.raise_for_status()
         cancel_outgoing = response.json()
+        if cancel_outgoing.get('errors'):
+            return None
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:

@@ -38,6 +38,8 @@ def get_peer_by_url(client: GraphQLClient, peer_url: str, asset_id: str):
         )
         response.raise_for_status()
         peer = response.json()
+        if peer.get('errors'):
+            return None
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:
@@ -91,6 +93,8 @@ def create_auto_peer(client: GraphQLClient, peer_url: str, asset_id: str, liquid
         )
         response.raise_for_status()
         peer = response.json()
+        if peer.get('errors'):
+            return None
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:

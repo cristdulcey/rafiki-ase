@@ -93,6 +93,8 @@ def get_wallet(client, wallet_id: str):
         )
         response.raise_for_status()
         wallet_complete = response.json()
+        if wallet_complete.get('errors'):
+            return None
         wallet = {
             'liquidity': wallet_complete.get('data', {}).get('walletAddress', {}).get('liquidity', 0) or 0,
             'status': wallet_complete.get('data', {}).get('walletAddress', {}).get('status', False)
@@ -249,6 +251,8 @@ def create_wallet_address_key(client, wallet_id: str):
         )
         response.raise_for_status()
         wallet_key = response.json()
+        if wallet_key.get('errors'):
+            return None
         # convert content private_key_pem to base64
         wallet_key_public_base64 = base64.b64encode(public_key_pem.encode('utf-8')).decode('utf-8')
         wallet_key_private_base64 = base64.b64encode(private_key_pem.encode('utf-8')).decode('utf-8')
@@ -304,7 +308,11 @@ def withdraw_wallet(client, wallet_id: str):
         timeout=5
     )
     response.raise_for_status()
-    return response.json()
+    withdraw = response.json()
+    print('withdraw', withdraw)
+    if withdraw.get('errors', None):
+        return None
+    return withdraw
 
 
 def create_wallet_address_key_from_client(client, wallet_id: str, key: str):
@@ -359,6 +367,8 @@ def create_wallet_address_key_from_client(client, wallet_id: str, key: str):
         )
         response.raise_for_status()
         wallet_key = response.json()
+        if wallet_key.get('errors'):
+            return None
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:

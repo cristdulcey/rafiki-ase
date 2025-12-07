@@ -1,6 +1,8 @@
+from datetime import datetime
+
 import uuid
 
-from sqlalchemy import Column, Enum, String
+from sqlalchemy import Column, Enum, String, DateTime, func
 
 from database import Base
 from sqlalchemy.dialects.postgresql import UUID
@@ -19,3 +21,4 @@ class Transfer(Base):
     amount = Column(String, nullable=False)
     description = Column(String, nullable=True)
     transaction_hash = Column(String, nullable=True)
+    created_at: datetime = Column(DateTime(timezone=True), server_default=func.now())
