@@ -51,11 +51,12 @@ def handle_event_outgoing_created(event: WebHook, db: Session):
     created = create_transfer_tiger_bettle(
         id_transaction, debit_account, credit_account, amount, ledger, 1, {'pending': True}
     )  # code=1 for TRANSFER code=2 for DEPOSIT code=3 for WITHDRAWAL
-    if not created:
+    print('Created transfer for outgoing payment:', created)
+    if created.get('results', None):
         raise HTTPException(status_code=500, detail="Transfer creation failed")
     deposit = deposit_outgoing_payment_liquidity(client, f'{payment.id}')
+    print('Created liquidity for outgoing payment:', deposit)
     if not deposit:
         raise HTTPException(status_code=500, detail="Deposit creation failed")
     print(f"Deposit {deposit} for payment {payment.id}")
-
     return

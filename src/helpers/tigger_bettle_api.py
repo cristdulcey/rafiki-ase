@@ -28,9 +28,9 @@ def to_tiger_beetle_id(id_value) -> int:
         raise TypeError('Unsupported type for id')
 
 
-def from_tiger_beetle_id(bi: int) -> str:
-    str_val = hex(bi)[2:]  # Remove '0x' prefix
-    str_val = str_val.rjust(32, '0')  # Pad to 32 chars
+def from_tiger_beetle_id(str_val: str) -> str:
+    # str_val = hex(bi) # Remove '0x' prefix
+    # str_val = str_val.rjust(32, '0')  # Pad to 32 chars
     if len(str_val) == 32:
         return f"{str_val[0:8]}-{str_val[8:12]}-{str_val[12:16]}-{str_val[16:20]}-{str_val[20:]}"
     return str_val
@@ -140,4 +140,34 @@ def get_accounts_by_id(id_list) -> list:
             print(f"Error fetching accounts via API: {response.status_code} {response.text}")
         else:
             print(f"Error fetching accounts via API: {error}")
+        return None
+
+
+def get_transfers() -> list:
+    payload = {
+        "filter": {
+            # "code": 1,
+            "ledger": 1,
+            "limit": 50,
+            "flags": {
+                # "reversed": False
+            }
+        }
+    }
+    url = f"{settings.tiger_beetle_api_url}/transfers/query"
+    try:
+        response = requests.post(
+            url,
+            json=payload,
+            timeout=10
+        )
+        response.raise_for_status()
+        response_obj = response.json()
+        return response_obj.get('transfers', [])
+    except requests.RequestException as error:
+        response = getattr(error, 'response', None)
+        if response is not None:
+            print(f"Error fetching transfers via API: {response.status_code} {response.text}")
+        else:
+            print(f"Error fetching transfers via API: {error}")
         return None

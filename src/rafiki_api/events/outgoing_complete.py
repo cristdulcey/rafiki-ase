@@ -18,7 +18,7 @@ def handle_event_outgoing_complete(event: WebHook, db: Session):
     """
 
     """
-    time.sleep(1)  # Sleep to ensure the event is processed after the payment is created
+    # time.sleep(2)  # Sleep to ensure the event is processed after the payment is created
     payment = event.data
     if not payment:
         print("No payment data found in the event.")
@@ -38,22 +38,21 @@ def handle_event_outgoing_complete(event: WebHook, db: Session):
     balance = int(payment.balance or 0)
     to_void = debit - send
     ledger = int(db_account.asset_ledger)
-
     print('Debit:', debit, 'Send:', send, 'To Void:', to_void)
     if to_void > 0:
         if balance == to_void:
             send_fee_to_asset = create_transfer_tiger_bettle(
                 generate_uuid(), debit, f'{db_account.asset_id}', send, ledger, 3
             )  # code=1 for TRANSFER code=2 for DEPOSIT code=3 for WITHDRAWAL
-
-    outgoing_withdraw = create_outgoing_payment_withdrawal(client, payment.id)
-    if not outgoing_withdraw:
-        print("No outgoing withdrawal data found in the event.")
-    print(outgoing_withdraw)
-    post_liquidity = post_liquidity_withdrawal(client, payment.id)
-    if not post_liquidity:
-        print("No post liquidity data found in the event.")
-    print(post_liquidity)
+            print('Send fee to asset:', send_fee_to_asset)
+    # outgoing_withdraw = create_outgoing_payment_withdrawal(client, payment.id)
+    # if not outgoing_withdraw:
+    #     print("No outgoing withdrawal data found in the event.")
+    # print('outgoing_withdraw created:', outgoing_withdraw)
+    # post_liquidity = post_liquidity_withdrawal(client, payment.id)
+    # if not post_liquidity:
+    #     print("No post liquidity data found in the event.")
+    # print('post_liquidity created:', post_liquidity)
     # send the transfer to the ledger from the asset
     id_transaction_ledger = generate_uuid()
     debit_account_ledger = f'{db_account.asset_id}'  # Asset ID
@@ -62,6 +61,7 @@ def handle_event_outgoing_complete(event: WebHook, db: Session):
     created_ledger = create_transfer_tiger_bettle(
         id_transaction_ledger, debit_account_ledger, credit_account_ledger, send, ledger, 3
     )  # code=1 for TRANSFER code=2 for DEPOSIT code=3 for WITHDRAWAL
-    if not created_ledger:
+    print('created_ledger:', created_ledger)
+    if created_ledger.get('results', None):
         raise HTTPException(status_code=500, detail="Transfer creation ledger failed")
     return

@@ -11,18 +11,18 @@
 #
 # result = get_wallet(client, "4e33de7b-4e27-4079-8556-3331cf6a8134")
 # print(result)
+import json
+
 from datetime import datetime
 
-from helpers.tigger_bettle import get_accounts_by_id, to_tiger_beetle_id, get_transactions_by_account, \
-    get_balances_by_account, get_transfers_by_id, from_tiger_beetle_id, create_tiger_beetle_account_wallet, \
-    create_transfer_tiger_bettle, get_transfers
+from helpers.tigger_bettle_api import to_tiger_beetle_id, get_accounts_by_id, from_tiger_beetle_id, get_transfers
 
-tb_peer_id = to_tiger_beetle_id('b7dd6753-c17f-4022-8d6d-26c391e13f10')  # Replace with the actual Tiger Beetle ID`)
-tb_asset_id = to_tiger_beetle_id('d5a43edb-3b47-495c-b7fc-9278a8bf7817')  # Replace with the actual Tiger Beetle ID`)
-tb_wallet_id = to_tiger_beetle_id('092c2003-2b40-4856-8119-1850f255142e')  # Replace with the actual Tiger Beetle ID`)
-tb_wallet2_id = to_tiger_beetle_id('37ac23f6-abb1-4a0d-be63-fe26be1419e6')  # Replace with the actual Tiger Beetle ID`)
-tb_incoming_id = to_tiger_beetle_id('9683034c-2d32-4ef1-98ac-bf8bb4f74d98')  # Replace with the actual Tiger Beetle ID`)
-tb_outgoing_id = to_tiger_beetle_id('2d4d805c-5302-47f8-b971-17b27cf35099')  # Replace with the actual Tiger Beetle ID`)
+# tb_peer_id = to_tiger_beetle_id('b7dd6753-c17f-4022-8d6d-26c391e13f10')  # Replace with the actual Tiger Beetle ID`)
+tb_asset_id = to_tiger_beetle_id('455a5d50-248d-4360-9568-a5d3662e79fc')  # Replace with the actual Tiger Beetle ID`)
+tb_wallet_id = to_tiger_beetle_id('eee52f4a-ac68-496a-8352-7a7fc03b98f6')  # Replace with the actual Tiger Beetle ID`)
+tb_wallet2_id = to_tiger_beetle_id('a04ba334-da12-418e-bbfa-f818f08c5188')  # Replace with the actual Tiger Beetle ID`)
+tb_incoming_id = to_tiger_beetle_id('8bb8d3b4-8be3-4b71-9cc2-9a9a0bae4c72')  # Replace with the actual Tiger Beetle ID`)
+tb_outgoing_id = to_tiger_beetle_id('b54088b4-aa68-4766-bb3e-556675cfae36')  # Replace with the actual Tiger Beetle ID`)
 
 ############# CREATE ACCOUNT
 
@@ -48,27 +48,27 @@ tb_outgoing_id = to_tiger_beetle_id('2d4d805c-5302-47f8-b971-17b27cf35099')  # R
 
 ############ GET ACCOUNTS BY ID
 
-print('GET ACCOUNTS BY ID')
-accounts = get_accounts_by_id(
-    [
-        1,
-        tb_peer_id,
-        tb_asset_id,
-        tb_wallet_id,
-        # tb_wallet2_id,
-        tb_incoming_id,
-        tb_outgoing_id
-    ]
-)
-for account in accounts:
-    dict_account = account.__dict__
-    if dict_account.get('user_data_128') != 0:
-        dict_account['user_data_128_uuid'] = from_tiger_beetle_id(dict_account['user_data_128'])
-    if dict_account.get('id') != 0:
-        dict_account['id_uuid'] = from_tiger_beetle_id(dict_account['id'])
-    if dict_account.get('timestamp') != 0:
-        dict_account['timestamp_date'] = f'{datetime.fromtimestamp(dict_account.get("timestamp") / 1_000_000_000)}'
-    print(f"\n{account.__dict__}\n")
+# print('GET ACCOUNTS BY ID')
+# accounts = get_accounts_by_id(
+#     [
+#         1,
+#         # tb_peer_id,
+#         tb_asset_id,
+#         tb_wallet_id,
+#         tb_wallet2_id,
+#         tb_incoming_id,
+#         tb_outgoing_id
+#     ]
+# )
+# for account in accounts:
+#     dict_account = account
+#     if dict_account.get('user_data_128') != 0:
+#         dict_account['user_data_128_uuid'] = from_tiger_beetle_id(dict_account.get('user_data_128', ''))
+#     if dict_account.get('id') != 0:
+#         dict_account['id_uuid'] = from_tiger_beetle_id(dict_account.get('id', ''))
+#     if dict_account.get('timestamp') != 0:
+#         dict_account['timestamp_date'] = f'{datetime.fromtimestamp(dict_account.get("timestamp") / 1_000_000_000)}'
+#     print(f"\n{json.dumps(dict_account, indent=4)}\n")
 
 ############# LIST TRANSACTIONS BY ACCOUNT
 
@@ -96,21 +96,19 @@ for account in accounts:
 print('LIST TRANSFERS')
 transfers = get_transfers()
 for transfer in transfers:
-    dict_transaction = transfer.__dict__
+    dict_transaction = transfer
     if dict_transaction.get('id') != 0:
-        dict_transaction['id_uuid'] = from_tiger_beetle_id(dict_transaction['id'])
+        dict_transaction['id_uuid'] = from_tiger_beetle_id(dict_transaction.get('id'))
     if dict_transaction.get('user_data_128') != 0:
-        dict_transaction['user_data_128_uuid'] = from_tiger_beetle_id(dict_transaction['user_data_128'])
+        dict_transaction['user_data_128_uuid'] = from_tiger_beetle_id(dict_transaction.get('user_data_128',''))
     if dict_transaction.get('debit_account_id') != 0:
-        dict_transaction['debit_account_uuid'] = from_tiger_beetle_id(dict_transaction['debit_account_id'])
+        dict_transaction['debit_account_uuid'] = from_tiger_beetle_id(dict_transaction.get('debit_account_id',''))
     if dict_transaction.get('credit_account_id') != 0:
-        dict_transaction['credit_account_uuid'] = from_tiger_beetle_id(dict_transaction['credit_account_id'])
+        dict_transaction['credit_account_uuid'] = from_tiger_beetle_id(dict_transaction.get('credit_account_id',''))
     if dict_transaction.get('timestamp') != 0:
         dict_transaction[
             'timestamp_date'] = f'{datetime.fromtimestamp(dict_transaction.get("timestamp") / 1_000_000_000)}'
-    print(f"\n{dict_transaction}\n")
-
-
+    print(f"\n{json.dumps(dict_transaction, indent=4)}\n")
 
 ############ BALANCES BY ACCOUNT
 

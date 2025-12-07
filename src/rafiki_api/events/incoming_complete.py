@@ -58,7 +58,7 @@ def handle_event_incoming_complete(event: WebHook, db: Session):
     created = create_transfer_tiger_bettle(
         id_transaction, debit_account, credit_account, amount, ledger, 3
     )  # code=1 for TRANSFER code=2 for DEPOSIT code=3 for WITHDRAWAL
-    if not created:
+    if created.get('results', None):
         raise HTTPException(status_code=500, detail="Transfer creation failed send the transfer to the asset from the wallet address")
     # send the transfer to the ledger from the asset
     id_transaction_ledger = generate_uuid()  # Transaction ID Incoming payment or Outgoing payment or Deposit
@@ -68,6 +68,6 @@ def handle_event_incoming_complete(event: WebHook, db: Session):
     created_ledger = create_transfer_tiger_bettle(
         id_transaction_ledger, debit_account_ledger, credit_account_ledger, amount, ledger, 1
     )  # code=1 for TRANSFER code=2 for DEPOSIT code=3 for WITHDRAWAL
-    if not created_ledger:
+    if created_ledger.get('results', None):
         raise HTTPException(status_code=500, detail="Transfer creation ledger failed")
     return
