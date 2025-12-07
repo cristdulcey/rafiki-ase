@@ -1,6 +1,8 @@
 # import sentry_sdk
 import os
 
+from middlewares.error_handler import error_middleware
+
 # Ensure TigerBeetle client avoids io_uring on hosts that block it
 os.environ.setdefault("TB_CLIENT_IO", "sync")
 
@@ -27,6 +29,9 @@ app = FastAPI(
 origins = [
     "*",
 ]
+app.middleware("http")(error_middleware)
+
+
 
 app.add_middleware(
     CORSMiddleware,

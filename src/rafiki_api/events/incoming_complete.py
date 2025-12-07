@@ -6,7 +6,8 @@ from sqlalchemy.orm import Session
 
 from helpers.create_key import generate_uuid
 from helpers.signature import GraphQLClient
-from helpers.tigger_bettle import create_transfer_tiger_bettle, get_accounts_by_id
+from helpers.tigger_bettle_api import create_transfer_tiger_bettle
+
 from models.account import Account
 from rafiki_api.transfer import create_incoming_payment_withdrawal
 from schemas.webhook_schema import WebHook

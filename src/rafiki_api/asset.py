@@ -32,6 +32,8 @@ def get_asset_by_code_and_scale(client: GraphQLClient, code: str, scale: int):
         )
         response.raise_for_status()
         asset = response.json()
+        if asset.get('errors'):
+            return None
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:
@@ -84,6 +86,8 @@ def get_asset_by_id(client: GraphQLClient, asset_id: str):
         )
         response.raise_for_status()
         asset = response.json()
+        if asset.get('errors'):
+            return None
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:
@@ -130,6 +134,8 @@ def create_asset(client: GraphQLClient, code: str, scale: int):
         )
         response.raise_for_status()
         asset = response.json()
+        if asset.get('errors'):
+            return None
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:

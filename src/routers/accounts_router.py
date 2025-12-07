@@ -4,12 +4,11 @@ from fastapi import Depends, HTTPException, APIRouter
 from starlette import status
 
 from database import get_db
-from helpers.create_key import generate_uuid
 from helpers.signature import GraphQLClient
+from helpers.tigger_bettle_api import get_accounts_by_id, create_tiger_beetle_account_wallet
 from rafiki_api.asset import get_asset_by_id
-from schemas.account_schema import AccountDetailResponse, DepositBase, WithdrawBase, LinkKeyBase
+from schemas.account_schema import AccountDetailResponse, LinkKeyBase
 
-from helpers.tigger_bettle import create_tiger_beetle_account_wallet, create_transfer_tiger_bettle, get_accounts_by_id
 from models.account import Account
 from rafiki_api.wallet import get_wallet, create_wallet, create_wallet_address_key, withdraw_wallet, \
     create_wallet_address_key_from_client
@@ -36,7 +35,7 @@ async def create_account(account: AccountCreate, db: Session = Depends(get_db)):
     account_asset = get_accounts_by_id([f'{account.asset_id}'])
     if len(account_asset) == 0:
         raise HTTPException(status_code=400, detail="Tiger Beetle account ledger not exists")
-    ledger = int(account_asset[0].ledger)
+    ledger = int(account_asset[0].get('ledger', 0))
     wallet_id = wallet.get('data', {}).get('createWalletAddress', {}).get('walletAddress', {}).get('id', '')
     wallet_address = wallet.get('data', {}).get('createWalletAddress', {}).get('walletAddress', {}).get('address', '')
     wallet_key = create_wallet_address_key(client, wallet_id)
@@ -63,7 +62,7 @@ async def create_account(account: AccountCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Failed to create account")
     code = 1  # LIQUIDITY_WEB_MONETIZATION
     account_tigerbeetle_created = create_tiger_beetle_account_wallet(wallet_id, f'{account.asset_id}', ledger, code)
-    if not account_tigerbeetle_created:
+    if account_tigerbeetle_created.get('results', None):
         raise HTTPException(status_code=500, detail="Failed to create Tiger Beetle account")
     return account_data
 

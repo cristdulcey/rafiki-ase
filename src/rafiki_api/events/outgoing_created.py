@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 from tigerbeetle import TransferFlags
 
 from helpers.signature import GraphQLClient
-from helpers.tigger_bettle import create_transfer_tiger_bettle, get_accounts_by_id
+from helpers.tigger_bettle_api import create_transfer_tiger_bettle
 from models.account import Account
-from rafiki_api.transfer import  cancel_outgoing_payment, deposit_outgoing_payment_liquidity
+from rafiki_api.transfer import cancel_outgoing_payment, deposit_outgoing_payment_liquidity
 from rafiki_api.wallet import get_wallet
 from schemas.webhook_schema import WebHook
 
@@ -49,7 +49,7 @@ def handle_event_outgoing_created(event: WebHook, db: Session):
     credit_account = f'{db_account.asset_id}'
     # ledger = 1
     created = create_transfer_tiger_bettle(
-        id_transaction, debit_account, credit_account, amount, ledger, 1, TransferFlags.PENDING
+        id_transaction, debit_account, credit_account, amount, ledger, 1, {'pending': True}
     )  # code=1 for TRANSFER code=2 for DEPOSIT code=3 for WITHDRAWAL
     if not created:
         raise HTTPException(status_code=500, detail="Transfer creation failed")

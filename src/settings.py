@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     is_tenant: Optional[bool] = os.getenv('is_tenant', False)
     domain_wallet: Optional[str] = os.getenv('domain_wallet', 'https://open-payments.cristdulcey.com/accounts')
     tiger_beetle_address: Optional[str] = os.getenv('tiger_beetle_address', '4242')
+    tiger_beetle_api_url: Optional[str] = os.getenv('tiger_beetle_api_url', 'http://tigerbeetle_api:50051')
     add_peer: Optional[str] = os.getenv('add_peer', '')
     asset_id: Optional[str] = os.getenv('asset_id', '06cdd91e-caee-4182-93c9-b0b405bf7f20')
 

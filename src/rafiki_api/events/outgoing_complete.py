@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from helpers.create_key import generate_uuid
 from helpers.signature import GraphQLClient
-from helpers.tigger_bettle import create_transfer_tiger_bettle, get_accounts_by_id
+from helpers.tigger_bettle_api import create_transfer_tiger_bettle
 from models.account import Account
 from rafiki_api.transfer import create_outgoing_payment_withdrawal, post_liquidity_withdrawal
 from rafiki_api.wallet import get_wallet
@@ -43,7 +43,7 @@ def handle_event_outgoing_complete(event: WebHook, db: Session):
     if to_void > 0:
         if balance == to_void:
             send_fee_to_asset = create_transfer_tiger_bettle(
-                generate_uuid(), debit_account_ledger, f'{db_account.asset_id}', send, ledger, 3
+                generate_uuid(), debit, f'{db_account.asset_id}', send, ledger, 3
             )  # code=1 for TRANSFER code=2 for DEPOSIT code=3 for WITHDRAWAL
 
     outgoing_withdraw = create_outgoing_payment_withdrawal(client, payment.id)

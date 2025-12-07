@@ -1,11 +1,12 @@
 services:
   ase:
-    image: registry.digitalocean.com/loducode/rafiki-ase:2
-#    security_opt:
-#      - seccomp:unconfined
-#    build:
-#        context: .
-#        dockerfile: ./Dockerfile
+#    image: registry.digitalocean.com/loducode/ase:1.0.4
+    platform: linux/amd64
+    security_opt:
+      - seccomp:unconfined
+    build:
+        context: .
+        dockerfile: ./Dockerfile
     command: uvicorn main:app --reload --host 0.0.0.0 --port 10000
     env_file:
       - .envs/.env
@@ -13,3 +14,17 @@ services:
       - ./src/:/code
     ports:
       - "10000:10000"
+
+  tigerbeetle_api:
+    image: ghcr.io/lil5/tigerbeetle_api:latest
+    security_opt:
+      - seccomp:unconfined
+    ports:
+      - '50051:50051'
+    environment:
+      - PORT=50051
+      - TB_CLUSTER_ID=0
+      - TB_ADDRESSES=10.117.0.83:4242
+      - USE_GRPC=false
+      - GRPC_REFLECTION=true
+      - CLIENT_COUNT=1
