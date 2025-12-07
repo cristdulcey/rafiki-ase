@@ -25,3 +25,13 @@ def get_db():
         yield db
     finally:
         db.close()
+
+config_elastic = {
+    'url': settings.ELASTIC_URL,
+    'user': 'elastic',
+    'password': settings.ELASTIC_PASSWORD,
+    'index': settings.ELASTIC_INDEX,
+    'environment':settings.ELASTIC_ENVIRONMENT,
+    'limit': False,
+    'debug': False
+}
