@@ -5,6 +5,7 @@ from database import get_db
 from enums.auth import TransferEnum
 from helpers.account import get_db_account
 from helpers.create_key import generate_uuid
+from helpers.dependencies import validate_auth
 from helpers.signature import GraphQLClient
 from helpers.tigger_bettle_api import create_transfer_tiger_bettle
 from helpers.transfers import create_transfer_db
@@ -13,7 +14,7 @@ from rafiki_api.transfer import create_transfer
 
 from sqlalchemy.orm import Session
 
-from rafiki_api.wallet import withdraw_wallet, get_wallet
+from rafiki_api.wallet import withdraw_wallet
 from schemas.account_schema import DepositBase, AccountResponse, WithdrawBase
 from schemas.transfer_schema import TransferBase, TransferResponse, TransferCreateBase
 
@@ -22,7 +23,7 @@ router = APIRouter(prefix="/transfers", tags=["Transfers"])
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=TransferResponse)
-async def transfer(transfer_obj: TransferBase, db: Session = Depends(get_db)):
+async def transfer(transfer_obj: TransferBase, db: Session = Depends(get_db), payload=Depends(validate_auth)):
     '''
     Create a transfer between two accounts of the node
     '''
@@ -37,12 +38,12 @@ async def transfer(transfer_obj: TransferBase, db: Session = Depends(get_db)):
     try:
         wallet_object = get_db_account(db, f'{transfer_obj.wallet_sender_id}')
         db_transfer = TransferCreateBase(
-            type_transfer = TransferEnum.TRANSFER,
-            sender_wallet_address = wallet_object.wallet_address,
-            receiver_wallet_address = transfer_obj.wallet_receive_url,
-            asset_code = wallet_object.asset_code,
-            amount =transfer_obj.amount * (10 ** wallet_object.asset_scale),
-            description = transfer_obj.description,
+            type_transfer=TransferEnum.TRANSFER,
+            sender_wallet_address=wallet_object.wallet_address,
+            receiver_wallet_address=transfer_obj.wallet_receive_url,
+            asset_code=wallet_object.asset_code,
+            amount=transfer_obj.amount * (10 ** wallet_object.asset_scale),
+            description=transfer_obj.description,
             # transaction_hash = transfer_response
         )
         create_transfer_db(db, db_transfer)
@@ -52,14 +53,14 @@ async def transfer(transfer_obj: TransferBase, db: Session = Depends(get_db)):
 
 
 @router.post("/top-up", status_code=status.HTTP_201_CREATED, response_model=AccountResponse)
-async def top_up_account(deposit: DepositBase, db: Session = Depends(get_db)):
+async def top_up_account(deposit: DepositBase, db: Session = Depends(get_db), payload=Depends(validate_auth)):
     '''
     Top-up an account by creating a transfer in Tiger Beetle.
     :param deposit:
     :param db:
     :return:
     '''
-    db_account = get_db_account(db,f'{deposit.wallet_address_id}')
+    db_account = get_db_account(db, f'{deposit.wallet_address_id}')
     if not db_account:
         raise HTTPException(status_code=404, detail="Account not found")
     id_transaction = generate_uuid()  # Transaction ID Incoming payment or Outgoing payment or Deposit
@@ -75,12 +76,12 @@ async def top_up_account(deposit: DepositBase, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Failed to create deposit transfer")
     try:
         db_transfer = TransferCreateBase(
-            type_transfer = TransferEnum.TOP_UP,
-            sender_wallet_address = f'{db_account.asset_id}',
-            receiver_wallet_address = db_account.wallet_address,
-            asset_code = db_account.asset_code,
-            amount = amount,
-            description = '',
+            type_transfer=TransferEnum.TOP_UP,
+            sender_wallet_address=f'{db_account.asset_id}',
+            receiver_wallet_address=db_account.wallet_address,
+            asset_code=db_account.asset_code,
+            amount=amount,
+            description='',
             # transaction_hash = transfer_response
         )
         create_transfer_db(db, db_transfer)
@@ -90,14 +91,14 @@ async def top_up_account(deposit: DepositBase, db: Session = Depends(get_db)):
 
 
 @router.post("/deposit", status_code=status.HTTP_201_CREATED, response_model=AccountResponse)
-async def deposit_account(deposit: DepositBase, db: Session = Depends(get_db)):
+async def deposit_account(deposit: DepositBase, db: Session = Depends(get_db), payload=Depends(validate_auth)):
     '''
     Deposit an account by creating a transfer in Tiger Beetle. From Ledger to Asset and then Asset to Wallet of client.
     :param deposit:
     :param db:
     :return:
     '''
-    db_account = get_db_account(db,f'{deposit.wallet_address_id}')
+    db_account = get_db_account(db, f'{deposit.wallet_address_id}')
     if not db_account:
         raise HTTPException(status_code=404, detail="Account not found")
     id_transaction_ledger = generate_uuid()  # Transaction ID Incoming payment or Outgoing payment or Deposit
@@ -121,13 +122,13 @@ async def deposit_account(deposit: DepositBase, db: Session = Depends(get_db)):
     print('created', created)
     try:
         db_transfer = TransferCreateBase(
-            type_transfer = TransferEnum.DEPOSIT,
-            sender_wallet_address = f'{db_account.asset_id}',
-            receiver_wallet_address = db_account.wallet_address,
-            asset_code = db_account.asset_code,
-            amount = amount,
-            description = '',
-            transaction_hash = f'{id_transaction_asset}|{id_transaction_ledger}'
+            type_transfer=TransferEnum.DEPOSIT,
+            sender_wallet_address=f'{db_account.asset_id}',
+            receiver_wallet_address=db_account.wallet_address,
+            asset_code=db_account.asset_code,
+            amount=amount,
+            description='',
+            transaction_hash=f'{id_transaction_asset}|{id_transaction_ledger}'
         )
         create_transfer_db(db, db_transfer)
     except Exception as error:
@@ -136,8 +137,8 @@ async def deposit_account(deposit: DepositBase, db: Session = Depends(get_db)):
 
 
 @router.post("/withdraw", status_code=status.HTTP_201_CREATED, response_model=AccountResponse)
-async def withdraw_account(withdraw: WithdrawBase, db: Session = Depends(get_db)):
-    db_account = get_db_account(db,f'{withdraw.wallet_address_id}')
+async def withdraw_account(withdraw: WithdrawBase, db: Session = Depends(get_db), payload=Depends(validate_auth)):
+    db_account = get_db_account(db, f'{withdraw.wallet_address_id}')
     if not db_account:
         raise HTTPException(status_code=404, detail="Account not found")
     created = withdraw_wallet(client, f'{db_account.wallet_address_id}')
@@ -147,13 +148,14 @@ async def withdraw_account(withdraw: WithdrawBase, db: Session = Depends(get_db)
     try:
         pass
         db_transfer = TransferCreateBase(
-            type_transfer = TransferEnum.WITHDRAW,
-            sender_wallet_address = f'{db_account.wallet_address}',
-            receiver_wallet_address = f'{db_account.asset_ledger}',
-            asset_code = db_account.asset_code,
-            amount = created.get('data', {}).get('createWalletAddressWithdrawal', {}).get('withdrawal', {}).get('amount', 0) ,
-            description = '',
-            transaction_hash = f''
+            type_transfer=TransferEnum.WITHDRAW,
+            sender_wallet_address=f'{db_account.wallet_address}',
+            receiver_wallet_address=f'{db_account.asset_ledger}',
+            asset_code=db_account.asset_code,
+            amount=created.get('data', {}).get('createWalletAddressWithdrawal', {}).get('withdrawal', {}).get('amount',
+                                                                                                              0),
+            description='',
+            transaction_hash=f''
         )
         create_transfer_db(db, db_transfer)
     except Exception as error:
