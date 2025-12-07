@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     ELASTIC_URL: str = os.getenv('ELASTIC_URL', '')
     ELASTIC_PASSWORD: str = os.getenv('ELASTIC_PASSWORD', '')
     ELASTIC_INDEX: str = os.getenv('ELASTIC_INDEX', '')
+    API_V1_STR: str = os.getenv('API_V1_STR', '')
     SENTRY_DSN: str = os.getenv('SENTRY_DSN', '')
 
 # # callback to get your configuration

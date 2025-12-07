@@ -2,7 +2,7 @@ import os
 import sentry_sdk
 
 from database import config_elastic
-from elasticsearch_middleware import ElasticsearchLoggerMiddleware
+from middlewares.elasticsearch_middleware import ElasticsearchLoggerMiddleware
 from middlewares.error_handler import error_middleware
 
 # Ensure TigerBeetle client avoids io_uring on hosts that block it

@@ -13,9 +13,9 @@ from jose import jwt
 from starlette.types import ASGIApp, Receive, Scope, Send
 from elasticsearch import AsyncElasticsearch
 
+from helpers.dependencies import ALGORITHM
 from settings import settings
 
-from santelellano_shared.utils.security import ALGORITHM
 
 
 class LogLevelEnum:
