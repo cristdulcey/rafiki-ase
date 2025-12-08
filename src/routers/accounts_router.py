@@ -90,6 +90,18 @@ async def get_account(wallet_id: uuid.UUID, db: Session = Depends(get_db)):
     db_account.status = wallet_object.get('status')
     return db_account
 
+@router.get("/{wallet_address}", response_model=AccountDetailResponse)
+async def get_account(wallet_address: str, db: Session = Depends(get_db)):
+    db_account = db.query(Account).filter(Account.wallet_address == f'{wallet_address}').first()
+    if not db_account:
+        raise HTTPException(status_code=404, detail="Account not found")
+    wallet_object = get_wallet(client, f'{db_account.wallet_address_id}')
+    if not wallet_object:
+        raise HTTPException(status_code=404, detail="Wallet not found")
+    db_account.liquidity = wallet_object.get('liquidity', 0)
+    db_account.status = wallet_object.get('status')
+    return db_account
+
 
 @router.post("/key", status_code=status.HTTP_201_CREATED, response_model=AccountResponse)
 async def link_key_to_wallet(withdraw: LinkKeyBase, db: Session = Depends(get_db)):
