@@ -90,7 +90,7 @@ async def get_account(wallet_id: uuid.UUID, db: Session = Depends(get_db)):
     db_account.status = wallet_object.get('status')
     return db_account
 
-@router.get("/{wallet_address}", response_model=AccountDetailResponse)
+@router.get("/search/{wallet_address}", response_model=AccountDetailResponse)
 async def get_account(wallet_address: str, db: Session = Depends(get_db)):
     db_account = db.query(Account).filter(Account.path == f'{wallet_address}').first()
     if not db_account:
