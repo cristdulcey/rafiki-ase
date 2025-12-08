@@ -92,7 +92,7 @@ async def get_account(wallet_id: uuid.UUID, db: Session = Depends(get_db)):
 
 @router.get("/{wallet_address}", response_model=AccountDetailResponse)
 async def get_account(wallet_address: str, db: Session = Depends(get_db)):
-    db_account = db.query(Account).filter(Account.wallet_address == f'{wallet_address}').first()
+    db_account = db.query(Account).filter(Account.path == f'{wallet_address}').first()
     if not db_account:
         raise HTTPException(status_code=404, detail="Account not found")
     wallet_object = get_wallet(client, f'{db_account.wallet_address_id}')
