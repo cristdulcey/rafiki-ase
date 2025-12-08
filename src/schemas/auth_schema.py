@@ -12,6 +12,10 @@ class Token(BaseModel):
 class TokenPayload(BaseModel):
     sub: Optional[str] = None
     type: Optional[str] = None
+    client: Optional[str] = None
+    iss: Optional[str] = None
+    aud: Optional[str] = None
+    scope: Optional[str] = None
 
 
 class RefreshToken(BaseModel):

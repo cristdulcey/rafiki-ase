@@ -1,6 +1,8 @@
 import base64
 import uuid
 from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+import secrets
 
 
 
@@ -66,5 +68,23 @@ def generate_jwk(private_key, key_id: str):
     }
 
 
+def generate_rsa_keypair(key_size: int = 2048):
+    """Generate RSA private/public key pair in PEM format."""
+    private_key = rsa.generate_private_key(public_exponent=65537, key_size=key_size)
+    private_pem = private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption(),
+    ).decode("utf-8")
+    public_pem = private_key.public_key().public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo,
+    ).decode("utf-8")
+    return private_pem, public_pem
+
+
+def generate_symmetric_key(length_bytes: int = 32) -> str:
+    """Generate a base64url-encoded symmetric key with the requested entropy."""
+    return secrets.token_urlsafe(length_bytes)
 
 

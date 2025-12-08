@@ -67,6 +67,18 @@ async def create_account(account: AccountCreate, db: Session = Depends(get_db)):
     return account_data
 
 
+@router.get("/search/{wallet_address}", response_model=AccountDetailResponse)
+async def get_search_account(wallet_address: str, db: Session = Depends(get_db)):
+    db_account = db.query(Account).filter(Account.path == f'{wallet_address}').first()
+    if not db_account:
+        raise HTTPException(status_code=404, detail="Account not found")
+    wallet_object = get_wallet(client, f'{db_account.wallet_address_id}')
+    if not wallet_object:
+        raise HTTPException(status_code=404, detail="Wallet not found")
+    db_account.liquidity = wallet_object.get('liquidity', 0)
+    db_account.status = wallet_object.get('status')
+    return db_account
+
 @router.get("", response_model=AccountListResponse)
 async def get_accounts(db: Session = Depends(get_db)):
     accounts = db.query(Account).all()
@@ -84,18 +96,6 @@ async def get_account(wallet_id: uuid.UUID, db: Session = Depends(get_db)):
     if not db_account:
         raise HTTPException(status_code=404, detail="Account not found")
     wallet_object = get_wallet(client, f'{wallet_id}')
-    if not wallet_object:
-        raise HTTPException(status_code=404, detail="Wallet not found")
-    db_account.liquidity = wallet_object.get('liquidity', 0)
-    db_account.status = wallet_object.get('status')
-    return db_account
-
-@router.get("/search/{wallet_address}", response_model=AccountDetailResponse)
-async def get_account(wallet_address: str, db: Session = Depends(get_db)):
-    db_account = db.query(Account).filter(Account.path == f'{wallet_address}').first()
-    if not db_account:
-        raise HTTPException(status_code=404, detail="Account not found")
-    wallet_object = get_wallet(client, f'{db_account.wallet_address_id}')
     if not wallet_object:
         raise HTTPException(status_code=404, detail="Wallet not found")
     db_account.liquidity = wallet_object.get('liquidity', 0)

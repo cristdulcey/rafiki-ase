@@ -20,6 +20,7 @@ from routers import accounts_router
 from routers import transfers_router
 from routers import rates_router
 from routers import idp
+from routers import app_keys_router
 from settings import settings
 
 app = FastAPI(
@@ -48,6 +49,7 @@ app.include_router(accounts_router.router)
 app.include_router(transfers_router.router)
 app.include_router(rates_router.router)
 app.include_router(idp.router)
+app.include_router(app_keys_router.router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 

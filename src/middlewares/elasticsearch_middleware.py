@@ -13,7 +13,6 @@ from jose import jwt
 from starlette.types import ASGIApp, Receive, Scope, Send
 from elasticsearch import AsyncElasticsearch
 
-from helpers.dependencies import ALGORITHM
 from settings import settings
 
 
@@ -124,7 +123,7 @@ class ElasticsearchLoggerMiddleware:
                             try:
                                 token = autorization_header.split(' ')[1]
                                 payload = jwt.decode(
-                                    token, settings.SECRET_KEY, algorithms=[ALGORITHM]
+                                    token, settings.SECRET_KEY, algorithms=['RS256']
                                 )
                                 log_data["user_id"] = payload['sub']
                             except Exception as e:
