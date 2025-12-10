@@ -174,6 +174,7 @@ def create_wallet(client, wallet_path: str, asset_id: str, name: str,tenant_id: 
             headers=headers,
             timeout=5
         )
+        print(response.text)
         response.raise_for_status()
         wallet = response.json()
         if wallet.get('errors'):

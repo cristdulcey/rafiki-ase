@@ -24,7 +24,7 @@ services:
     environment:
       - PORT=50051
       - TB_CLUSTER_ID=0
-      - TB_ADDRESSES=10.117.4.81:4242
+      - TB_ADDRESSES=10.117.4.114:4242
       - USE_GRPC=false
       - GRPC_REFLECTION=true
       - CLIENT_COUNT=1
