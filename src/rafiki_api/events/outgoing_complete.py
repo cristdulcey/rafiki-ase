@@ -10,6 +10,7 @@ from models.account import Account
 from rafiki_api.transfer import create_outgoing_payment_withdrawal, post_liquidity_withdrawal
 from rafiki_api.wallet import get_wallet
 from schemas.webhook_schema import WebHook
+from settings import settings
 
 client = GraphQLClient()
 
@@ -30,7 +31,7 @@ def handle_event_outgoing_complete(event: WebHook, db: Session):
     db_account = db.query(Account).filter(Account.wallet_address_id == f'{wallet_address_id}').first()
     if not db_account:
         raise HTTPException(status_code=404, detail="Account not found")
-    wallet_object = get_wallet(client, f'{wallet_address_id}')
+    wallet_object = get_wallet(client, f'{wallet_address_id}', settings.tenant_id)
     if not wallet_object:
         raise HTTPException(status_code=404, detail="Wallet not found")
     debit = int(payment.debitAmount.value)

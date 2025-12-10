@@ -8,6 +8,7 @@ from models.account import Account
 from rafiki_api.transfer import cancel_outgoing_payment, deposit_outgoing_payment_liquidity
 from rafiki_api.wallet import get_wallet
 from schemas.webhook_schema import WebHook
+from settings import settings
 
 client = GraphQLClient()
 
@@ -34,7 +35,7 @@ def handle_event_outgoing_created(event: WebHook, db: Session):
     if amount == 0:
         print("Received amount is zero, no update needed.")
         return
-    wallet_object = get_wallet(client, f'{wallet_address_id}')
+    wallet_object = get_wallet(client, f'{wallet_address_id}', settings.tenant_id)
     if not wallet_object:
         raise HTTPException(status_code=404, detail="Wallet not found")
     liquidity = int(wallet_object.get('liquidity', 0))

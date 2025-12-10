@@ -4,7 +4,7 @@ from helpers.signature import GraphQLClient
 from settings import settings
 
 
-def get_peer_by_url(client: GraphQLClient, peer_url: str, asset_id: str):
+def get_peer_by_url(client: GraphQLClient, peer_url: str, asset_id: str, tenant_id: str):
     graphql_query = {
         "query": """
             query GetPeerByAddressAndAsset($address: String!, $assetId: String!) {
@@ -19,12 +19,14 @@ def get_peer_by_url(client: GraphQLClient, peer_url: str, asset_id: str):
                 }
                 liquidity
                 liquidityThreshold
+                tenantId
               }
             }
         """,
         "variables": {
             "address": peer_url,
-            "assetId": asset_id
+            "assetId": asset_id,
+            "tenantId": tenant_id
         }
     }
     headers = client.get_signature_headers(graphql_query)
@@ -52,7 +54,7 @@ def get_peer_by_url(client: GraphQLClient, peer_url: str, asset_id: str):
 
 
 def create_auto_peer(client: GraphQLClient, peer_url: str, asset_id: str, liquidity_to_deposit: int):
-    get_peer = get_peer_by_url(client, peer_url, asset_id)
+    get_peer = get_peer_by_url(client, peer_url, asset_id, settings.tenant_id)
     print(get_peer)
     if get_peer and get_peer.get('data', {}).get('id'):
         print(f"Peer already exists: {get_peer}")

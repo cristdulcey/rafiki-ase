@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     secret_graphql: Optional[str] = os.getenv('secret_graphql', 'iyIgCprjb9uL8wFckR+pLEkJWMB7FJhgkvqhTQR/964=')
     version_graphql: Optional[int] = os.getenv('version_graphql', 1)
     idp_secret: Optional[str] = os.getenv('idp_secret', '2pEcn2kkCclbOHQiGNEwhJ0rucATZhrA807HTm2rNXE=')
-    is_tenant: Optional[bool] = os.getenv('is_tenant', False)
+    is_tenant: Optional[bool] = os.getenv('is_tenant', True)
     domain_wallet: Optional[str] = os.getenv('domain_wallet', 'https://open-payments.cristdulcey.com/accounts')
     # tiger_beetle_address: Optional[str] = os.getenv('tiger_beetle_address', '4242')
     tiger_beetle_api_url: Optional[str] = os.getenv('tiger_beetle_api_url', 'http://tigerbeetle_api:50051')

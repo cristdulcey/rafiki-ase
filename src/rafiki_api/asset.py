@@ -4,7 +4,7 @@ from helpers.signature import GraphQLClient
 from settings import settings
 
 
-def get_asset_by_code_and_scale(client: GraphQLClient, code: str, scale: int):
+def get_asset_by_code_and_scale(client: GraphQLClient, code: str, scale: int, tenant_id: str ):
     graphql_query = {
         "query": """
             query GetAssetByCodeAndScale($code: String!, $scale: UInt8!) {
@@ -13,12 +13,14 @@ def get_asset_by_code_and_scale(client: GraphQLClient, code: str, scale: int):
                 code
                 scale
                 liquidityThreshold
+                tenantId
               }
             }
         """,
         "variables": {
             "code": code,
             "scale": scale,
+            "tenantId": tenant_id
         }
     }
     headers = client.get_signature_headers(graphql_query)
@@ -44,7 +46,7 @@ def get_asset_by_code_and_scale(client: GraphQLClient, code: str, scale: int):
         print("OOps: Something Else", err)
     return asset
 
-def get_asset_by_id(client: GraphQLClient, asset_id: str):
+def get_asset_by_id(client: GraphQLClient, asset_id: str, tenant_id: str):
     graphql_query = {
         "query": """
             query GetAsset($id: String!) {
@@ -68,11 +70,13 @@ def get_asset_by_id(client: GraphQLClient, asset_id: str):
                     basisPoints
                     fixed
                 }
+                tenantId
               }
             }
         """,
         "variables": {
             "id": asset_id,
+            "tenantId": tenant_id
         }
     }
     headers = client.get_signature_headers(graphql_query)
@@ -99,8 +103,8 @@ def get_asset_by_id(client: GraphQLClient, asset_id: str):
     return asset
 
 
-def create_asset(client: GraphQLClient, code: str, scale: int):
-    validate_if_exists = get_asset_by_code_and_scale(client, code, scale)
+def create_asset(client: GraphQLClient, code: str, scale: int, tenant_id: str):
+    validate_if_exists = get_asset_by_code_and_scale(client, code, scale, settings.tenant_id)
     if validate_if_exists:
         return validate_if_exists
     graphql_query = {
@@ -112,6 +116,7 @@ def create_asset(client: GraphQLClient, code: str, scale: int):
                   code
                   scale
                   liquidityThreshold
+                  tenantId
                 }
               }
             }
@@ -120,6 +125,7 @@ def create_asset(client: GraphQLClient, code: str, scale: int):
             "input": {
                 "code": code,
                 "scale": scale,
+                "tenantId": tenant_id
             }
         }
     }

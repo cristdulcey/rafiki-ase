@@ -11,7 +11,7 @@ from helpers.create_key import generate_jwk
 from settings import settings
 
 
-def get_wallet(client, wallet_id: str):
+def get_wallet(client, wallet_id: str, tenant_id: str):
     graphql_query = {
         "query": """
             query GetWalletAddress($id: String!) {
@@ -75,11 +75,13 @@ def get_wallet(client, wallet_id: str):
                       value
                       visibleInOpenPayments
                     }
+                    tenantId
                 }
             }
         """,
         "variables": {
-            "id": f"{wallet_id}"
+            "id": f"{wallet_id}",
+            "tenantId": tenant_id
         }
     }
     headers = client.get_signature_headers(graphql_query)
@@ -125,7 +127,7 @@ def get_wallet(client, wallet_id: str):
     return wallet
 
 
-def create_wallet(client, wallet_path: str, asset_id: str, name: str, additional_properties: list = None):
+def create_wallet(client, wallet_path: str, asset_id: str, name: str,tenant_id: str,additional_properties: list = None):
     graphql_query = {
         "query": """
                 mutation CreateWalletAddres($input: CreateWalletAddressInput!) {
@@ -148,6 +150,7 @@ def create_wallet(client, wallet_path: str, asset_id: str, name: str, additional
                         value
                         visibleInOpenPayments
                       }
+                      tenantId
                     }
                   }
                 }
@@ -157,7 +160,8 @@ def create_wallet(client, wallet_path: str, asset_id: str, name: str, additional
                 "assetId": asset_id,
                 "address": f'{settings.domain_wallet}/{wallet_path}',
                 "publicName": name,
-                "additionalProperties": additional_properties
+                "additionalProperties": additional_properties,
+                "tenantId": tenant_id
             }
         }
     }

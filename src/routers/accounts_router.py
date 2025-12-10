@@ -15,6 +15,8 @@ from rafiki_api.wallet import get_wallet, create_wallet, create_wallet_address_k
 from schemas.account_schema import AccountResponse, AccountCreate, AccountListResponse
 from sqlalchemy.orm import Session
 
+from settings import settings
+
 client = GraphQLClient()
 router = APIRouter(prefix="/accounts", tags=["Accounts"])
 
@@ -24,10 +26,10 @@ async def create_account(account: AccountCreate, db: Session = Depends(get_db)):
     db_account = db.query(Account).filter(Account.path == account.path).first()
     if db_account:
         raise HTTPException(status_code=400, detail="Account name already exists")
-    asset = get_asset_by_id(client, f'{account.asset_id}')
+    asset = get_asset_by_id(client, f'{account.asset_id}', settings.tenant_id)
     if not asset:
         raise HTTPException(status_code=404, detail="Asset not found")
-    wallet = create_wallet(client, account.path, f'{account.asset_id}', account.name)
+    wallet = create_wallet(client, account.path, f'{account.asset_id}', account.name, settings.tenant_id)
     if not wallet:
         raise HTTPException(status_code=500, detail="Failed to create wallet address")
     asset_code = f'{asset.get("data", {}).get("asset", {}).get("code", "USD")}'
@@ -72,12 +74,13 @@ async def get_search_account(wallet_address: str, db: Session = Depends(get_db))
     db_account = db.query(Account).filter(Account.path == f'{wallet_address}').first()
     if not db_account:
         raise HTTPException(status_code=404, detail="Account not found")
-    wallet_object = get_wallet(client, f'{db_account.wallet_address_id}')
+    wallet_object = get_wallet(client, f'{db_account.wallet_address_id}', settings.tenant_id)
     if not wallet_object:
         raise HTTPException(status_code=404, detail="Wallet not found")
     db_account.liquidity = wallet_object.get('liquidity', 0)
     db_account.status = wallet_object.get('status')
     return db_account
+
 
 @router.get("", response_model=AccountListResponse)
 async def get_accounts(db: Session = Depends(get_db)):
@@ -95,7 +98,7 @@ async def get_account(wallet_id: uuid.UUID, db: Session = Depends(get_db)):
     db_account = db.query(Account).filter(Account.wallet_address_id == f'{wallet_id}').first()
     if not db_account:
         raise HTTPException(status_code=404, detail="Account not found")
-    wallet_object = get_wallet(client, f'{wallet_id}')
+    wallet_object = get_wallet(client, f'{wallet_id}', settings.tenant_id)
     if not wallet_object:
         raise HTTPException(status_code=404, detail="Wallet not found")
     db_account.liquidity = wallet_object.get('liquidity', 0)
