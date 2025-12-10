@@ -11,7 +11,7 @@ class Token(BaseModel):
 
 class TokenPayload(BaseModel):
     sub: Optional[str] = None
-    type: Optional[str] = None
+    token_type: Optional[str] = None
     client: Optional[str] = None
     iss: Optional[str] = None
     aud: Optional[str] = None

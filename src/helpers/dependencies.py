@@ -84,7 +84,7 @@ def validate_auth(
 
         token_data = TokenPayload(**payload)
 
-        if token_data.type != "access":
+        if token_data.token_type != "access":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Invalid token type",
@@ -107,10 +107,16 @@ def validate_auth(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="Invalid audience for third-party token",
                 )
-
-    except (JWTError, ValidationError):
+    except (JWTError, ValidationError) as error:
+        if isinstance(error, ValidationError):
+            err_detail = error.errors()  # o e.json()
+        else:  # JWTError
+            err_detail = str(error) or repr(error)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Could not validate credentials",
+            detail={
+                "message": "Could not validate credentials",
+                "error": err_detail,
+            },
         )
     return token_data
