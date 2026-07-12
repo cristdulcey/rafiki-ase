@@ -26,10 +26,6 @@ class Settings(BaseSettings):
     tiger_beetle_api_url: Optional[str] = os.getenv('tiger_beetle_api_url', 'http://tigerbeetle_api:50051')
     add_peer: Optional[str] = os.getenv('add_peer', '')
     asset_id: Optional[str] = os.getenv('asset_id', '06cdd91e-caee-4182-93c9-b0b405bf7f20')
-    ELASTIC_ENVIRONMENT: str = os.getenv('ELASTIC_ENVIRONMENT', 'dev')
-    ELASTIC_URL: str = os.getenv('ELASTIC_URL', '')
-    ELASTIC_PASSWORD: str = os.getenv('ELASTIC_PASSWORD', '')
-    ELASTIC_INDEX: str = os.getenv('ELASTIC_INDEX', '')
     API_V1_STR: str = os.getenv('API_V1_STR', '')
     SENTRY_DSN: str = os.getenv('SENTRY_DSN', '')
 
