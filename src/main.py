@@ -1,8 +1,6 @@
 import os
 import sentry_sdk
 
-from database import config_elastic
-from middlewares.elasticsearch_middleware import ElasticsearchLoggerMiddleware
 from middlewares.error_handler import error_middleware
 
 # Ensure TigerBeetle client avoids io_uring on hosts that block it
@@ -56,10 +54,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 secret_key = os.getenv("SECRET_KEY", "fallback-secret-key")
 
 app.add_middleware(SessionMiddleware, secret_key=secret_key)
-
-if settings.ELASTIC_URL != '':
-    app.add_middleware(ElasticsearchLoggerMiddleware, config=config_elastic)
-
 
 if settings.add_peer != "":
     client = GraphQLClient()
